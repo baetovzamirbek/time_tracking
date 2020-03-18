@@ -1,0 +1,36 @@
+.rest{
+    color: red;
+}
+
+#hide_report {
+    display: none;
+}
+
+tr {
+    display: none;
+}
+
+.trst {
+    display: block;
+}
+
+.showOnlyToday {
+    display: block;
+}
+
+.table , tr{
+    width: 90%;
+}
+
+td, th {
+    width: 30%;
+}
+
+a , a:hover {
+    margin: 5px;
+    text-decoration: none;
+}
+
+.text-numb {
+    color: #aaa;
+}
