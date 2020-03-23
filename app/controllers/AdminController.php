@@ -11,7 +11,6 @@ class AdminController extends ControllerBase
 
         $name = $this->session->get('name');
         $id = $this->session->get('id');
-        //print_die($name);
         if (!$name) {
             return $this->dispatcher->forward(
                 [
@@ -56,9 +55,7 @@ class AdminController extends ControllerBase
         $this->tag->setTitle('Страница опозданий');
 
         $arr = [];
-        
         $users = User::find();
-        $db = StartTime::findFirst();        
         $number = cal_days_in_month(CAL_GREGORIAN, 3, 2020);
         for ($i = 1; $i <= $number; $i++) {
             $lateArr = [];
@@ -74,7 +71,7 @@ class AdminController extends ControllerBase
             array_push($arr, ['i'=>$i, 'lateArr'=>$lateArr]);
         }
         $this->view->dates = $arr;
-        $this->view->startTime = $db->time;
+        $this->view->startTime = StartTime::findFirst()->time;
         $this->view->users = $users;
     }
 
@@ -82,8 +79,7 @@ class AdminController extends ControllerBase
     public function changelateAction()
     {
         $users = User::find();
-        $setTime =$_POST['settime']; 
-
+        $setTime =$this->request->getPost('settime');
         
         if ((StartTime::find())) {
             $dbTime = new StartTime();           
@@ -97,15 +93,15 @@ class AdminController extends ControllerBase
         $dbTime->save();
 
         $monthData = Late::getData($users);
-        $db = Late::find();              
-        $db->delete();
+        $late_data = Late::find();
+        $late_data->delete();
         foreach ($monthData['totalLateTime'] as $object) {
             foreach ($object['arr'] as $obj) {
-                $db = new Late();          
-                $db->user_id = $obj['user_id'];
-                $db->date = $obj['date'];
-                $db->time = $obj['time'];
-                $db->save();
+                $late_data = new Late();
+                $late_data->user_id = $obj['user_id'];
+                $late_data->date = $obj['date'];
+                $late_data->time = $obj['time'];
+                $late_data->save();
             }
         }
         exit(json_encode($monthData['totalLateTime']));
@@ -114,12 +110,12 @@ class AdminController extends ControllerBase
 
     public function deleteLateAction()
     {
-        $id = $_POST['id']; 
-        $db = Late::findFirst([
+        $id = $this->request->getPost('id');
+        $late_data = Late::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
         ]);              
-        $db->delete();
+        $late_data->delete();
         exit(json_encode('1'));
     }
 
@@ -133,14 +129,14 @@ class AdminController extends ControllerBase
     public function addToDbAction()
     {
         if ($this->request->isPost()) {
-            $db = new User();             
-            $db->login = $this->request->getPost('login');
-            $db->name = $this->request->getPost('name');
-            $db->email = $this->request->getPost('email');
-            $db->password = sha1($this->request->getPost('password'));
-            $db->role = 1;
-            $db->status = 1;
-            $db->save();
+            $user_data = new User();
+            $user_data->login = $this->request->getPost('login');
+            $user_data->name = $this->request->getPost('name');
+            $user_data->email = $this->request->getPost('email');
+            $user_data->password = sha1($this->request->getPost('password'));
+            $user_data->role = 1;
+            $user_data->status = 1;
+            $user_data->save();
 
             $this->flash->success('New user saved');
             return $this->dispatcher->forward(
@@ -156,7 +152,6 @@ class AdminController extends ControllerBase
     public function deleteuserAction()
     {
         $this->tag->setTitle('Удаление пользователя');
-
         $users = User::find();
         $this->view->users = $users;
     }
@@ -164,54 +159,54 @@ class AdminController extends ControllerBase
 
     public function changeStatusAction()
     {
-        $id = $_POST['id']; 
+        $id = $this->request->getPost('id');
         $active = $_POST['active'];
-        $db = User::findFirst([
+        $user_data = User::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
         ]);
-        $db->status = $active;
-        $db->save();
-        exit(json_encode($db));
+        $user_data->status = $active;
+        $user_data->save();
+        exit(json_encode($user_data));
     }
 
 
     public function notWorkDaysAction()
     {
-        $notWork = NotWorkDays::find();
-        $this->view->notWork = $notWork;
+        $notWork_data = NotWorkDays::find();
+        $this->view->notWork = $notWork_data;
     }
 
 
     public function deleteNotWorkAction()
     {
-        $id = $_POST['id'];
-        $db = NotWorkDays::findFirst([
+        $id = $this->request->getPost('id');
+        $notWork_data = NotWorkDays::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
-        ]);              
-        $db->delete();
-        exit(json_encode($id));
+        ]);
+        $notWork_data->delete();
+        exit(json_encode($notWork_data));
     }
 
 
     public function repeatNotWorkAction()
     {
-        $id = $_POST['id']; 
+        $id = $this->request->getPost('id');
         $active = $_POST['active'];
-        $db = NotWorkDays::findFirst([
+        $notWork_data = NotWorkDays::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
         ]);
-        $db->every_year = $active;
-        $db->save();
+        $notWork_data->every_year = $active;
+        $notWork_data->save();
         exit(json_encode());
     }
 
     public function addNotWorkAction()
     {
-        $date = $_POST['date'];
-        $active = $_POST['active'];
+        $date = $this->request->getPost('date');
+        $active = $this->request->getPost('active');
         $db = new NotWorkDays();       
         $db->date = $date;
         $db->every_year = $active;
@@ -221,17 +216,15 @@ class AdminController extends ControllerBase
 
     public function updateTimeAction()
     {
-        $id = $_POST['id'];
-        $time = $_POST['time'];
-        $db = Tracking::findFirst([
+        $id = $this->request->getPost('id');
+        $time = $this->request->getPost('time');
+        $time_data = Tracking::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
         ]);
-        $db->start_time = $time;
-        $db->save();
-        exit(json_encode($db));
+        $time_data->start_time = $time;
+        $time_data->save();
+        exit(json_encode($time_data));
     }
-
-    
 }
 
