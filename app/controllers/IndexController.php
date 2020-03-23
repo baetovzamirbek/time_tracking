@@ -1,9 +1,9 @@
 <?php
 use Phalcon\Http\Request;
+use app\handler;
 
 class IndexController extends ControllerBase
 {
-
     public function indexAction()
     {
         $this->tag->setTitle('Time tracking tool');
@@ -11,51 +11,34 @@ class IndexController extends ControllerBase
         $id = $this->session->get('id');
         $role = $this->session->get('role');
 
-        if($role == 1) {
-            $role = 'partials/user';
-        }
-        else {
-            $role = 'partials/guest';
-        }
-        if($role == 2) {
-            return $this->dispatcher->forward(
-                     [
-                         "controller" => "admin",
-                         "action" => "index",
-                     ]
-                 );
-        }
         $request = new Request();
         if ($this->request->isPost()) {
             $select_month = $request->getPost('select_month');
         } else {
             $select_month = date("m");
         }
-        
 
         date_default_timezone_set('Asia/Bishkek');
         $today = date("d");
-        $months = [
-            'December', 'January', 'February', 'March', 'April',
-            'May', 'June', 'July', 'August', 'September', 'October', 'November'
-        ];
-        $todayMonth = $months[intval($select_month)];
+        $todayMonth = MONTHS[intval($select_month)];
 
         $users = User::find();
+        $monthData = $this->handler->getData($select_month, $users);
 
-        $monthData = Tracking::getData($select_month, $users);
-
-        $this->view->username = $name;
-        $this->view->user_id = $id;
-        $this->view->users = $users;
-        $this->view->data = $monthData['month'];
-        $this->view->totalDays = $monthData['totalDays'];
-        $this->view->totalWorkingDays = $monthData['totalDays'] - $monthData['notWorkingDays'];
-        $this->view->today = $today;
-        $this->view->todayMonth = $todayMonth;
-        $this->view->numTodayMonth = date("m");
-        $this->view->numSelectMonth = $select_month;
-        $this->view->role = $role;
+        $this->view->setVars([
+            'months' => MONTHS,
+            'username' => $name,
+            'user_id' => $id,
+            'users' => $users,
+            'data' => $monthData['month'],
+            'totalDays' => $monthData['totalDays'],
+            'totalWorkingDays' => $monthData['totalDays'] - $monthData['notWorkingDays'],
+            'today' => $today,
+            'todayMonth' => $todayMonth,
+            'numTodayMonth' => date("m"),
+            'numSelectMonth' => $select_month,
+            'role' => $role,
+        ]);
     }
 
     public function stopAction()

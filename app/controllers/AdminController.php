@@ -7,46 +7,6 @@ class AdminController extends ControllerBase
 
     public function indexAction()
     {
-        $this->tag->setTitle('Admin panel');
-
-        $name = $this->session->get('name');
-        $id = $this->session->get('id');
-        if (!$name) {
-            return $this->dispatcher->forward(
-                [
-                    "controller" => "user",
-                    "action" => "index",
-                ]
-            );
-        }
-        $request = new Request();
-        if ($this->request->isPost()) {
-            $select_month = $request->getPost('select_month');
-        } else {
-            $select_month = date("m");
-        }
-        
-
-        date_default_timezone_set('Asia/Bishkek');
-        $today = date("d");
-        $months = [
-            'December', 'January', 'February', 'March', 'April',
-            'May', 'June', 'July', 'August', 'September', 'October', 'November'
-        ];
-        $todayMonth = $months[intval($select_month)];
-
-        $users = User::find();
-
-        $monthData = Tracking::getData($select_month, $users);
-
-        $this->view->users = $users;
-        $this->view->data = $monthData['month'];
-        $this->view->totalDays = $monthData['totalDays'];
-        $this->view->totalWorkingDays = $monthData['totalDays'] - $monthData['notWorkingDays'];
-        $this->view->today = $today;
-        $this->view->todayMonth = $todayMonth;
-        $this->view->numTodayMonth = date("m");
-        $this->view->numSelectMonth = $select_month;
     }
 
 
@@ -67,7 +27,7 @@ class AdminController extends ControllerBase
                     'bind' => ['user' => $user->id, 'date' =>$date ]
                 ]);
                 array_push($lateArr, ['lateDb'=>$lateDb]);
-            }            
+            }
             array_push($arr, ['i'=>$i, 'lateArr'=>$lateArr]);
         }
         $this->view->dates = $arr;
@@ -80,19 +40,19 @@ class AdminController extends ControllerBase
     {
         $users = User::find();
         $setTime = $this->request->getPost('settime');
-        
+
         if ((StartTime::find())) {
-            $dbTime = new StartTime();           
+            $dbTime = new StartTime();
         }
         else {
-            $dbTime = StartTime::find(); 
+            $dbTime = StartTime::find();
         }
 
         $dbTime->id =1;
         $dbTime->time = $setTime;
         $dbTime->save();
 
-        $monthData = Late::getData($users);
+        $monthData = $this->handler->getLateData($users);
         $late_data = Late::find();
         $late_data->delete();
         foreach ($monthData['totalLateTime'] as $object) {
@@ -114,7 +74,7 @@ class AdminController extends ControllerBase
         $late_data = Late::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
-        ]);              
+        ]);
         $late_data->delete();
         exit(json_encode('1'));
     }
@@ -193,7 +153,7 @@ class AdminController extends ControllerBase
     public function repeatNotWorkAction()
     {
         $id = $this->request->getPost('id');
-        $active = $_POST['active'];
+        $active = $this->request->getPost('active');
         $notWork_data = NotWorkDays::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
@@ -227,4 +187,3 @@ class AdminController extends ControllerBase
         exit(json_encode($time_data));
     }
 }
-

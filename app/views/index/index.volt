@@ -8,5 +8,5 @@
     <p></p>
       <button type="button" class="btn btn-light" id="show_report">Report by month</button>
       <button type="button" class="btn btn-light" id="hide_report">Hide report</button>
-      <div id="report">{{ partial(role) }}</div>
+      <div id="report">{{partial('partials/user')}}</div>
 </div>

@@ -68,6 +68,15 @@ $router->add(
     ]
 );
 
+
+$router->add(
+    '/admin/index',
+    [
+        'controller' => 'admin',
+        'action'     => 'index',
+    ]
+);
+
 $router->add(
     '/admin/late',
     [

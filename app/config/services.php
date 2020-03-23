@@ -10,6 +10,7 @@ use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Flash\Direct as Flash;
 use Phalcon\Mvc\Dispatcher;
 use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Loader;
 
 /**
  * Shared configuration service
@@ -104,10 +105,6 @@ $di->set('flash', function () {
     ]);
 });
 
-/**/
-$di->set('handler', function () {
-    return new Handler();
-});
 
 /**
  * Start the session the first time some component request the session service
@@ -155,3 +152,14 @@ $di->set(
         return $dispatcher;
     }
 );
+
+$loader = new Loader();
+$loader->registerClasses(
+    [
+        'Handler'         => 'app/handler/Handler.php',
+    ]
+);
+$loader->register();
+$di->set('handler', function () {
+    return new Handler();
+});

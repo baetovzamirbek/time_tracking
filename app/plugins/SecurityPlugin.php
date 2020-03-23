@@ -76,13 +76,6 @@ class SecurityPlugin extends Plugin
                 }
             }
 
-            //Grant access to private area to role Users
-//            foreach ($privateResources as $resource => $actions) {
-//                foreach ($actions as $action) {
-//                    $acl->allow('Users', $resource, $action);
-//                }
-//            }
-
             foreach ($privateResources as $resource => $actions) {
                 foreach ($actions as $action) {
                     $acl->allow('Admin', $resource, $action);
@@ -121,6 +114,7 @@ class SecurityPlugin extends Plugin
         $acl = $this->getAcl();
 
         if (!$acl->isResource($controller)) {
+
             return false;
         }
 
