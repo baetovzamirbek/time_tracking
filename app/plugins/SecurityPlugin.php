@@ -121,22 +121,10 @@ class SecurityPlugin extends Plugin
         $acl = $this->getAcl();
 
         if (!$acl->isResource($controller)) {
-//            $dispatcher->forward([
-//                'controller' => 'index',
-//                'action' => 'index'
-//            ]);
-
             return false;
         }
 
         $allowed = $acl->isAllowed($role, $controller, $action);
-//        if ($allowed) {
-//
-//            $dispatcher->forward([
-//                'controller' => $controller,
-//                'action' => $action
-//            ]);
-//        }
         if (!$allowed) {
             $dispatcher->forward([
                 'controller' => 'errors',

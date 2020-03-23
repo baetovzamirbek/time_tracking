@@ -79,7 +79,7 @@ class AdminController extends ControllerBase
     public function changelateAction()
     {
         $users = User::find();
-        $setTime =$this->request->getPost('settime');
+        $setTime = $this->request->getPost('settime');
         
         if ((StartTime::find())) {
             $dbTime = new StartTime();           
@@ -160,7 +160,7 @@ class AdminController extends ControllerBase
     public function changeStatusAction()
     {
         $id = $this->request->getPost('id');
-        $active = $_POST['active'];
+        $active = $this->request->getPost('active');
         $user_data = User::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
@@ -207,10 +207,10 @@ class AdminController extends ControllerBase
     {
         $date = $this->request->getPost('date');
         $active = $this->request->getPost('active');
-        $db = new NotWorkDays();       
-        $db->date = $date;
-        $db->every_year = $active;
-        $db->save();
+        $notWork_data = new NotWorkDays();
+        $notWork_data->date = $date;
+        $notWork_data->every_year = $active;
+        $notWork_data->save();
         exit(json_encode($active ));
     }
 

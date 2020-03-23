@@ -12,10 +12,10 @@ class IndexController extends ControllerBase
         $role = $this->session->get('role');
 
         if($role == 1) {
-            $text = 'partials/user';
+            $role = 'partials/user';
         }
         else {
-            $text = 'partials/guest';
+            $role = 'partials/guest';
         }
         if($role == 2) {
             return $this->dispatcher->forward(
@@ -55,13 +55,13 @@ class IndexController extends ControllerBase
         $this->view->todayMonth = $todayMonth;
         $this->view->numTodayMonth = date("m");
         $this->view->numSelectMonth = $select_month;
-        $this->view->text = $text;
+        $this->view->role = $role;
     }
 
     public function stopAction()
     {
         $this->view->disable();
-        $id =$_POST['id'];        
+        $id = $this->request->getPost('id');
         $tracking = Tracking::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
@@ -74,13 +74,13 @@ class IndexController extends ControllerBase
 
     public function startAction()
     {
-        $id = $_POST['id'];
-        $db = new Tracking();       
+        $id = $this->request->getPost('id');
+        $tracking_data = new Tracking();
         date_default_timezone_set('Asia/Bishkek');
-        $db->start_time = date('H:i:s', time());
-        $db->user_id = $id;
-        $db->day = date('Y:m:d', time());
-        $db->save();
-        exit(json_encode($db));
+        $tracking_data->start_time = date('H:i:s', time());
+        $tracking_data->user_id = $id;
+        $tracking_data->day = date('Y:m:d', time());
+        $tracking_data->save();
+        exit(json_encode($tracking_data));
     }
 }
