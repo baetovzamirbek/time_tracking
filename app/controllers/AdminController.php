@@ -4,11 +4,9 @@ use Phalcon\Http\Request;
 
 class AdminController extends ControllerBase
 {
-
     public function indexAction()
     {
     }
-
 
     public function lateAction()
     {
@@ -35,11 +33,9 @@ class AdminController extends ControllerBase
         $this->view->users = $users;
     }
 
-
     public function changelateAction()
     {
         $users = User::find();
-        $setTime = $this->request->getPost('settime');
 
         if ((StartTime::find())) {
             $dbTime = new StartTime();
@@ -49,7 +45,7 @@ class AdminController extends ControllerBase
         }
 
         $dbTime->id =1;
-        $dbTime->time = $setTime;
+        $dbTime->time = $this->request->getPost('settime');
         $dbTime->save();
 
         $monthData = $this->handler->getLateData($users);
@@ -67,7 +63,6 @@ class AdminController extends ControllerBase
         exit(json_encode($monthData['totalLateTime']));
     }
 
-
     public function deleteLateAction()
     {
         $id = $this->request->getPost('id');
@@ -79,12 +74,10 @@ class AdminController extends ControllerBase
         exit(json_encode('1'));
     }
 
-
     public function newuserAction()
     {
         $this->tag->setTitle('Страница нового пользователя');
     }
-
 
     public function addToDbAction()
     {
@@ -108,7 +101,6 @@ class AdminController extends ControllerBase
         }
     }
 
-
     public function deleteuserAction()
     {
         $this->tag->setTitle('Удаление пользователя');
@@ -116,20 +108,17 @@ class AdminController extends ControllerBase
         $this->view->users = $users;
     }
 
-
     public function changeStatusAction()
     {
         $id = $this->request->getPost('id');
-        $active = $this->request->getPost('active');
         $user_data = User::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
         ]);
-        $user_data->status = $active;
+        $user_data->status = $this->request->getPost('active');
         $user_data->save();
         exit(json_encode($user_data));
     }
-
 
     public function notWorkDaysAction()
     {
@@ -153,36 +142,32 @@ class AdminController extends ControllerBase
     public function repeatNotWorkAction()
     {
         $id = $this->request->getPost('id');
-        $active = $this->request->getPost('active');
         $notWork_data = NotWorkDays::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
         ]);
-        $notWork_data->every_year = $active;
+        $notWork_data->every_year = $this->request->getPost('active');
         $notWork_data->save();
-        exit(json_encode());
+        exit(json_encode($notWork_data));
     }
 
     public function addNotWorkAction()
     {
-        $date = $this->request->getPost('date');
-        $active = $this->request->getPost('active');
         $notWork_data = new NotWorkDays();
-        $notWork_data->date = $date;
-        $notWork_data->every_year = $active;
+        $notWork_data->date = $this->request->getPost('date');
+        $notWork_data->every_year = $this->request->getPost('active');
         $notWork_data->save();
-        exit(json_encode($active ));
+        exit(json_encode($notWork_data));
     }
 
     public function updateTimeAction()
     {
         $id = $this->request->getPost('id');
-        $time = $this->request->getPost('time');
         $time_data = Tracking::findFirst([
             "id = :id:",
             'bind' => ['id' => $id]
         ]);
-        $time_data->start_time = $time;
+        $time_data->start_time = $this->request->getPost('time');
         $time_data->save();
         exit(json_encode($time_data));
     }

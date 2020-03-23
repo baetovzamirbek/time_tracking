@@ -7,8 +7,7 @@ class IndexController extends ControllerBase
     public function indexAction()
     {
         $this->tag->setTitle('Time tracking tool');
-        $name = $this->session->get('name');
-        $id = $this->session->get('id');
+
         $role = $this->session->get('role');
 
         $request = new Request();
@@ -19,7 +18,6 @@ class IndexController extends ControllerBase
         }
 
         date_default_timezone_set('Asia/Bishkek');
-        $today = date("d");
         $todayMonth = MONTHS[intval($select_month)];
 
         $users = User::find();
@@ -27,13 +25,13 @@ class IndexController extends ControllerBase
 
         $this->view->setVars([
             'months' => MONTHS,
-            'username' => $name,
-            'user_id' => $id,
+            'username' => $this->session->get('name'),
+            'user_id' => $this->session->get('id'),
             'users' => $users,
             'data' => $monthData['month'],
             'totalDays' => $monthData['totalDays'],
             'totalWorkingDays' => $monthData['totalDays'] - $monthData['notWorkingDays'],
-            'today' => $today,
+            'today' => date("d"),
             'todayMonth' => $todayMonth,
             'numTodayMonth' => date("m"),
             'numSelectMonth' => $select_month,
@@ -57,11 +55,10 @@ class IndexController extends ControllerBase
 
     public function startAction()
     {
-        $id = $this->request->getPost('id');
         $tracking_data = new Tracking();
         date_default_timezone_set('Asia/Bishkek');
         $tracking_data->start_time = date('H:i:s', time());
-        $tracking_data->user_id = $id;
+        $tracking_data->user_id = $this->request->getPost('id');
         $tracking_data->day = date('Y:m:d', time());
         $tracking_data->save();
         exit(json_encode($tracking_data));
